@@ -10,10 +10,14 @@
         <title>Lab3</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="">
+        <link rel="stylesheet" href="lab3.css">
+        <script type= "text/javascript" src="lab3.js"></script>
+        <script type= "text/javascript" src="Lab3-timetable-data.json"></script> 
+        
+
     </head>
     <body>
-        <div>
+        <div id="subject" class="subject">
             <form action="/action_page.php">
                 <label for="Subject">Subject:</label>
                 <select name="Subject" id="Subject">
@@ -25,9 +29,7 @@
     
               <form action="/action_page.php">
                 <label for="CourseNumber">Course Number:</label>
-                <select name="CourseNumber" id="CourseNumber">
-                <option value= "CourseNumber"> Search by Course Number</option>
-                </select>
+                <input type="text">
                 <br><br>
               </form>
     
