@@ -1,22 +1,23 @@
-const { json } = require("express");
-
-const data 
-function start(){
-
-    data = JSON.parse("./Lab3-timetable-data.json"); 
-    createSubjectList(data.message)
-} 
 
 
-start()
 
-function createSubjectList(SubjectList){
-    document.getElementById("subject").innerHTML = `
-    <select>
-     <option>Subject </option>
-     ${Object.keys(SubjectList).map(function (subject) {
-         return `<option>${subject}</option>`
-     }).join('')}
-     </select>
-    `
+async function getDropDown() {
+    const response = await fetch("http://localhost:3000/api/dropdown");
+    const data = await response.json();
+    createDropDownList(data);
 }
+
+function createDropDownList(SubjectList){
+    var selectbox = document.getElementById("Subject");
+
+    for (i=0; i <SubjectList.length; i++) {
+        var newOption = document.createElement("option");
+        var optionText = document.createTextNode(SubjectList[i]);
+        newOption.appendChild(optionText);
+        selectbox.appendChild(newOption);
+    }
+}
+
+getDropDown();
+
+
