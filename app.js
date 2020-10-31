@@ -12,26 +12,9 @@ app.use(express.static('Public'));
 db.defaults({schedules: []})
 .write()
 
-app.post('/api/schedules/createschedule' ,(req,res) => {
-    CurrentData =req.query;
 
-    if (db.get('schedules').find({schedule_id: CurrentData.name}).value){
-    return res.status(400).sent({
-        message: "Status 400, Something Went Wrong"
-       });
-    } else {
 
-    db.get('schedules')
-    .push({ schedule_id: CurrentData.name, schedule_information: []})
-    .write()
-
-    return res.status(200).send({
-        message: "Status 200 OK, schedule added"
-    });
-}    
-});
-
-app.get('/api/schedules/load/:schedule_id', (res,req) => {
+/*app.get('/api/schedules/load/:schedule_id', (res,req) => {
     const data = req.params.schedule_id;
     const sched_array = db.get('schedules').map('schedule_id').value
 
@@ -141,7 +124,7 @@ app.delete('/api/shcedule/delete', (req,res) => {
             message: "Status 200 OK"
         });
     }
-})
+})*/
 
 
 
@@ -152,7 +135,7 @@ var InformationArray = [];
 
 
 
-
+//1
 function removeDuplicates(Array){
     return Array.filter((a,b) => Array.indexOf(a) === b)
 };
@@ -180,7 +163,7 @@ app.get('/api/courses', (req,res) => {
         
 });
 
-
+//2
 app.get('/api/courses/:subjectcode', (req,res) => {
     let subjectcode = req.params.subjectcode;
     let NumberArray = [];
@@ -201,7 +184,7 @@ app.get('/api/courses/:subjectcode', (req,res) => {
     
 });
 
-
+//3
 app.get('/api/courses/:subjectcode/:coursecode', (req,res) => {
     let subjectcode = req.params.subjectcode;
     let coursecode = req.params.coursecode;
@@ -230,6 +213,21 @@ app.get('/api/courses/:subjectcode/:coursecode', (req,res) => {
     
 });
 
+//4
+app.post('/api/schedules/createschedule' ,(req,res) => {
+    CurrentData =req.query.name;
+
+    if (db.get('schedules').find({scheduleName: CurrentData}).value()){
+    return res.status(400).send( "Something Went Wrong");
+    } else {
+
+    db.get('schedules')
+    .push({ scheduleName: CurrentData, CourseList: []})
+    .write()
+
+    return res.status(200).send( "schedule added");
+   }    
+});
 
 
 

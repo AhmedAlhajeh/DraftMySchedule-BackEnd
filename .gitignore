@@ -1,2 +1,4 @@
-*.json
+Lab3-timetable-data.json
+package-lock.json
+schedule_database.json
 node_modules
