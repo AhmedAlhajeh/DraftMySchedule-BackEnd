@@ -202,7 +202,7 @@ app.get('/api/courses/:subjectcode', (req,res) => {
 });
 
 
-/*app.get('/api/courses/:subjectcode/:coursecode', (req,res) => {
+app.get('/api/courses/:subjectcode/:coursecode', (req,res) => {
     let subjectcode = req.params.subjectcode;
     let coursecode = req.params.coursecode;
     let component = req.query.component;
@@ -228,7 +228,7 @@ app.get('/api/courses/:subjectcode', (req,res) => {
     
 
     
-});*/
+});
 
 
 
