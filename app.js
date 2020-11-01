@@ -100,38 +100,16 @@ app.get('/api/schedules/dropdown', (req,res) => {
     let name_array = [];
     name_array = db.get('schedules').map('schedule_id').value();
     res.send(name_array);
-});
-
-app.delete('/api/shcedule/delete', (req,res) => {
-    CurrentData = req.query;
-    
-    if (CurrentData.schedule == "all_schedules") {
-        return res.status(404).send({
-            message: "Status 404"
-        });
-    }
-
-    db.get('schedules')
-    .remove({schedule_id: CurrentData.schedule})
-    .write()
-
-    if (db.has('schedule_id : CurrentData.schedule').value()) {
-        return res.status(400).send({
-            message: "status 404"
-        });
-    } else {
-        return res.status(200).send({
-            message: "Status 200 OK"
-        });
-    }
-})*/
+});*/
 
 
 
 
 
 
-var InformationArray = [];
+
+
+
 
 
 
@@ -228,94 +206,58 @@ app.post('/api/schedules/createschedule' ,(req,res) => {
     return res.status(200).send( "schedule added");
    }    
 });
+ 
 
-
-
-
-/*app.get('/api/subjects', (req,res) => {
-    CurrentData = req.query;
-    InformationArray = [];
-    SubjectName = CurrentData.Subject;
-    number = CurrentData.CourseNumber;
-    component = CurrentData.Component;
-
-
-    if(SubjectName == "Subject" && number == "") {
-      return res.status(400).send({
-        message: "Too many results to display. Please Narrow Search fields."
-      });
-    } 
-    /*else if (SubjectName != "Subject" && number == "" && component != "Component") {
-
-        for (i=0; i<data.length;i++){
-            if (SubjectName == data[i].subject && component == data[i].course_info[0].ssr_component){
-            InformationArray.push(data[i]);
+//5
+app.put('/api/schedules/save', (res,req) => {
+    CurrentData = req.query.name;
+    let subjectcode = req.params.subjectcode;
+    let component = req.query.component;
+    scheduleName = db.get('schedules').find({ScheduleName: CurrentData}).value();
+    ResultSchedule = db.get('schedules').push({scheduleName: CurrentData, CourseList: []});
+    for(i=0; i<data.length; i++){
+        if(scheduleName && ResultSchedule){
+            if(subjectcode == data[i].subject && coursecode == data[i].catalog_nbr){
+                
             }
-        }
-
-
-        if (InformationArray.length == 0){
-           return res.status(404).send({
-               message: "not Found"
-            });
     
-        }  else {
-             res.send(InformationArray);
-             return true;
         }
+
     }
+    
+});
 
-    else if (SubjectName != "Subject" && number == "" && component == "Component"){
+//7
+app.delete('/api/schedules', (req,res) => {
+    CurrentData = req.query.schedule;
+    
 
-      for (i=0; i<data.length; i++){
-          if (SubjectName == data[i].subject){
-            InformationArray.push(data[i]);
-           }
-        }
-        if (InformationArray.length == 0){
-            return res.status(404).send({
-                message: "not found"
+    db.get('schedules')
+    .remove({scheduleName: CurrentData})
+    .write()
 
-            });
-        } else {
-
-            res.send(InformationArray);
-            return true;
-
-        } 
-    }
-
-    else if ((SubjectName != "Subject" && number != "" && component == "Component")){
-        for (i=0; i<data.length; i++) {
-            if (SubjectName == data[i].subject && number == data[i].catalog_nbr){
-                InformationArray.push(data[i]);
-            }
-        }
-        if (InformationArray.length == 0){
-            return res.status(404).send({
-                message = "Not found"
-            });
-        }   else {
-            res.send(InformationArray);
-            return true;
-        }
-    }
-
-    else if ((SubjectName == "Subject" && number != "" && component == "Component")) {
-        for (i=0; i<data.length; i++) {
-            if(number == data[i].catalog_nbr){
-                InformationArray.push(data[i]);
-            }
-        }
-       if (InformationArray.length == 0){
-        return res.status(404).send({
-            message: "Not Found"
-        });
+    if (db.has('scheduleName : CurrentData').value()) {
+        return res.status(400).send( "bad request");
     } else {
-        res.send(InformationArray);
-        return true;
+        return res.status(200).send({
+            message: "Schedule is deleted successfully"
+        });
     }
-  }
-});*/
+})
+
+//9
+app.delete('/api/schedules/all' , (req,res) =>{
+db.unset("schedules").write(); //it delets all schedules
+db.defaults({schedules: []}).write() //restart the system to make sure we can accept new schedule name
+res.send("All schedules have been deleted successfully ")
+
+})
+
+
+
+
+
+
+
 
 app.listen(3000, () => console.log('Listening on port 3000'));
