@@ -212,6 +212,26 @@ app.get('/api/courses/search/:subjectcode', (req,res) => {
 
 //3
 app.get('/api/courses/search/:subjectcode/:coursecode', (req,res) => {
+
+    const NoComponent = joi.object({
+        component:joi.string().max(5).required()
+    })
+    const RESULT3 = NoComponent.validate(req.query);
+    if (RESULT3.error){
+        res.status(400).send("Bad Query");
+        return; 
+
+    }
+
+    const WithComponent = joi.object({
+        component:joi.string().max(5).required()
+    })
+    const RESULT4 = WithComponent.validate(req.query);
+    if (RESULT4.error){
+        res.status(400).send("Bad Query");
+        return; 
+
+    }
     let subjectcode = req.params.subjectcode;
     let coursecode = req.params.coursecode;
     let component = req.query.component;
@@ -244,7 +264,7 @@ app.post('/api/schedules/createschedule' ,(req,res) => {
     const schema = joi.object({
         name:joi.string().max(18).required()
     })
-    const RESULT = schema.validate(req.query.name);
+    const RESULT = schema.validate(req.query);
     if (RESULT.error){
         res.status(400).send("Bad Query");
         return; 
@@ -300,6 +320,11 @@ app.put('/api/schedules/addCourse', (req, res) => {
       res.status(404).send("not saved yet!");
     }
   });
+
+  //6
+  app.get('/api/schedules/AddCourses', (req,res) => {
+
+  })
   
 
 //7
@@ -319,6 +344,17 @@ app.delete('/api/schedules', (req,res) => {
         });
     }
 })
+//8
+app.get('/api/schedules/schedulesList', (req,res) => {
+           
+        let ScheduleArray = [];
+        ScheduleArray = db.get('schedules').value();
+        
+        
+       
+        res.send(ScheduleArray);
+    
+});
 
 //9
 app.delete('/api/schedules/all' , (req,res) =>{
