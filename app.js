@@ -1,5 +1,7 @@
 const express = require('express');
 const app = express();
+app.use(express.json());
+const joi = require('joi');
 const data = require("./Lab3-timetable-data.json");
 const low = require('lowdb');
 const filesync = require('lowdb/adapters/filesync');
@@ -102,9 +104,54 @@ app.get('/api/schedules/dropdown', (req,res) => {
     res.send(name_array);
 });*/
 
+app.get('/api/courses/submit' , (req,res) => {
+    FinalQuery = req.query;
+    SubjectQuery = FinalQuery.Subject;
+    ComponentQuery = FinalQuery.Component;
+    CourseNumberQuery = FinalQuery.CourseNumber;
+    ClassNameQuery = FinalQuery.ClassName;
+    var allstored = [];
 
+    if (SubjectQuery == "Subject" && CourseNumberQuery == "" && ComponentQuery== "Component" && ClassNameQuery == "ClassName"){
+        res.send("Too many results to display. Please Narrow Search fields.")
+    }
+    else if (SubjectQuery != "Subject" && CourseNumberQuery != "" && ComponentQuery != "Component" &&  ClassNameQuery != "ClassName"){
+         allstored = [];
+        for(i=0; i<data.length;i++){
+    
+            if(SubjectQuery == data[i].subject && CourseNumberQuery == data[i].catalog_nbr && ComponentQuery== data[i].course_info[0].ssr_component &&  ClassNameQuery == data[i].className){
+             
+                allstored.push(data[i]);
 
+            }
+        } res.send(allstored);
+    } 
+    else if (SubjectQuery != "Subject" && CourseNumberQuery != "" && ComponentQuery == "Component" &&  ClassNameQuery == "ClassName"){
+         allstored = [];
+        for(i=0 ; i<data.length; i++){
+            if(SubjectQuery == data[i].subject && CourseNumberQuery == data[i].catalog_nbr){
+                allstored.push(data[i]);
+            }
+        } res.send(allstored);
+    }
+    else if (SubjectQuery != "Subject" && CourseNumberQuery != "" && ComponentQuery != "Component" &&  ClassNameQuery == "ClassName"){
+         allstored = [];
+        for(i=0 ; i<data.length; i++){
+            if(SubjectQuery == data[i].subject && CourseNumberQuery == data[i].catalog_nbr && ComponentQuery == data[i].course_info[0].ssr_component ){
+                allstored.push(data[i]);
+            }
+        } res.send(allstored);
 
+    }
+    else if (SubjectQuery != "Subject" && CourseNumberQuery == "" && ComponentQuery == "Component" &&  ClassNameQuery == "ClassName"){
+         allstored = [];
+        for(i=0 ; i<data.length; i++){
+            if(SubjectQuery == data[i].subject){
+                allstored.push(data[i]);
+           } 
+        }
+    }
+});
 
 
 
@@ -126,6 +173,7 @@ app.get('/api/courses', (req,res) => {
     
 
     SubjectArray = removeDuplicates(SubjectArray);
+
     let ClassArray = [];
     for(j=0; j< data.length; j++){
         ClassArray[j] = data[j].className;
@@ -142,7 +190,7 @@ app.get('/api/courses', (req,res) => {
 });
 
 //2
-app.get('/api/courses/:subjectcode', (req,res) => {
+app.get('/api/courses/search/:subjectcode', (req,res) => {
     let subjectcode = req.params.subjectcode;
     let NumberArray = [];
     for(k=0; k< data.length; k++){
@@ -163,7 +211,7 @@ app.get('/api/courses/:subjectcode', (req,res) => {
 });
 
 //3
-app.get('/api/courses/:subjectcode/:coursecode', (req,res) => {
+app.get('/api/courses/search/:subjectcode/:coursecode', (req,res) => {
     let subjectcode = req.params.subjectcode;
     let coursecode = req.params.coursecode;
     let component = req.query.component;
@@ -193,6 +241,15 @@ app.get('/api/courses/:subjectcode/:coursecode', (req,res) => {
 
 //4
 app.post('/api/schedules/createschedule' ,(req,res) => {
+    const schema = joi.object({
+        name:joi.string().max(18).required()
+    })
+    const RESULT = schema.validate(req.query.name);
+    if (RESULT.error){
+        res.status(400).send("Bad Query");
+        return; 
+
+    }
     CurrentData =req.query.name;
 
     if (db.get('schedules').find({scheduleName: CurrentData}).value()){
@@ -208,24 +265,42 @@ app.post('/api/schedules/createschedule' ,(req,res) => {
 });
  
 
+
+
 //5
-app.put('/api/schedules/save', (res,req) => {
-    CurrentData = req.query.name;
-    let subjectcode = req.params.subjectcode;
-    let component = req.query.component;
-    scheduleName = db.get('schedules').find({ScheduleName: CurrentData}).value();
-    ResultSchedule = db.get('schedules').push({scheduleName: CurrentData, CourseList: []});
-    for(i=0; i<data.length; i++){
-        if(scheduleName && ResultSchedule){
-            if(subjectcode == data[i].subject && coursecode == data[i].catalog_nbr){
-                
-            }
-    
-        }
+app.put('/api/schedules/addCourse', (req, res) => {
+    const QuerySchema = joi.object({
+        scheduleName:joi.string().max(18).required()
+    })
+    const RESULT1 = QuerySchema.validate(req.query);
+    if (RESULT1.error){
+        res.status(400).send("Bad Query");
+        return; 
+
+    }
+
+    const BodySchema = joi.object({
+        CourseList:joi.array().required()
+    })
+    const RESULT2 = BodySchema.validate(req.body);
+    if (RESULT2.error){
+        res.status(400).send("Bad Entry");
+        return; 
 
     }
     
-});
+    const name = req.query.scheduleName;
+    const scheduleCourses = req.body.CourseList;
+    let schedules = db.get('schedules').find({scheduleName: name}).value();
+    if(schedules) {
+      schedules.CourseList = scheduleCourses;
+      db.set({schedules: schedules}).write();
+      res.send("The values are saved to the schedule");
+    } else {
+      res.status(404).send("not saved yet!");
+    }
+  });
+  
 
 //7
 app.delete('/api/schedules', (req,res) => {
