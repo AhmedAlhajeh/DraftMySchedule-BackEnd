@@ -10,22 +10,23 @@ const db = low(adapter);
 app.use(express.static('Public')); 
 
 
-// Database defaults
+// Database 
 db.defaults({schedules: []})
 .write()
 
-
+// to show the results to the frontend when I press search
 app.get('/api/courses/submit' , (req,res) => {
-    FinalQuery = req.query;
-    SubjectQuery = FinalQuery.Subject;
-    ComponentQuery = FinalQuery.Component;
-    CourseNumberQuery = FinalQuery.CourseNumber;
-    ClassNameQuery = FinalQuery.ClassName;
+    FQuery = req.query;
+    SubjectQuery = FQuery.Subject;
+    ComponentQuery = FQuery.Component;
+    CourseNumberQuery = FQuery.CourseNumber;
+    ClassNameQuery = FQuery.ClassName;
     var allstored = [];
-
+    //if we are showing the results for all subjects, components, course number, and class name
     if (SubjectQuery == "Subject" && CourseNumberQuery == "" && ComponentQuery== "Component" && ClassNameQuery == "ClassName"){
-        res.send("Too many results to display. Please Narrow Search fields.")
+        res.send("Too many results to display.")
     }
+    //if we choose a specific subject, course number, component and class name
     else if (SubjectQuery != "Subject" && CourseNumberQuery != "" && ComponentQuery != "Component" &&  ClassNameQuery != "ClassName"){
          allstored = [];
         for(i=0; i<data.length;i++){
@@ -37,6 +38,7 @@ app.get('/api/courses/submit' , (req,res) => {
             }
         } res.send(allstored);
     } 
+    //if we wanna display the results by selecting subject and course number only
     else if (SubjectQuery != "Subject" && CourseNumberQuery != "" && ComponentQuery == "Component" &&  ClassNameQuery == "ClassName"){
          allstored = [];
         for(i=0 ; i<data.length; i++){
@@ -45,6 +47,7 @@ app.get('/api/courses/submit' , (req,res) => {
             }
         } res.send(allstored);
     }
+    //if we wanna display the results using everything except the class name
     else if (SubjectQuery != "Subject" && CourseNumberQuery != "" && ComponentQuery != "Component" &&  ClassNameQuery == "ClassName"){
          allstored = [];
         for(i=0 ; i<data.length; i++){
@@ -54,6 +57,7 @@ app.get('/api/courses/submit' , (req,res) => {
         } res.send(allstored);
 
     }
+    //if we want to to display results using subject
     else if (SubjectQuery != "Subject" && CourseNumberQuery == "" && ComponentQuery == "Component" &&  ClassNameQuery == "ClassName"){
          allstored = [];
         for(i=0 ; i<data.length; i++){
@@ -66,9 +70,9 @@ app.get('/api/courses/submit' , (req,res) => {
 
 
 
-//1
+//Get all available subject codes (property name: subject) and descriptions (property name: className)
 function removeDuplicates(Array){
-    return Array.filter((a,b) => Array.indexOf(a) === b)
+    return Array.filter((a,b) => Array.indexOf(a) === b) //no duplicates for the drop menu in front end
 };
 
 app.get('/api/courses', (req,res) => {
@@ -95,7 +99,7 @@ app.get('/api/courses', (req,res) => {
         
 });
 
-//2
+//Get all course codes (property name: catalog_nbr) for a given subject code. Return an error if the subject code doesn’t exist
 app.get('/api/courses/search/:subjectcode', (req,res) => {
     let subjectcode = req.params.subjectcode;
     let NumberArray = [];
@@ -116,24 +120,15 @@ app.get('/api/courses/search/:subjectcode', (req,res) => {
     
 });
 
-//3
+//Get the Timetable entry for a given subject code and course code and optional component
 app.get('/api/courses/search/:subjectcode/:coursecode', (req,res) => {
 
-    const NoComponent = joi.object({
-        component:joi.string().max(5).required()
-    })
-    const RESULT3 = NoComponent.validate(req.query);
-    if (RESULT3.error){
-        res.status(400).send("Bad Query");
-        return; 
-
-    }
-
+   
     const WithComponent = joi.object({
-        component:joi.string().max(5).required()
+        component:joi.string().max(3).min(3)
     })
     const RESULT4 = WithComponent.validate(req.query);
-    if (RESULT4.error){
+    if (RESULT4.error ){
         res.status(400).send("Bad Query");
         return; 
 
@@ -165,7 +160,7 @@ app.get('/api/courses/search/:subjectcode/:coursecode', (req,res) => {
     
 });
 
-//4
+//Create a new schedule (to save a list of courses) with a given schedule name. Return an error if name exists
 app.post('/api/schedules/createschedule' ,(req,res) => {
     const schema = joi.object({
         name:joi.string().max(18).min(1).required()
@@ -193,7 +188,7 @@ app.post('/api/schedules/createschedule' ,(req,res) => {
 
 
 
-//5
+//Save a list of subject code, course code pairs under a given schedule name
 app.put('/api/schedules/addCourse', (req, res) => {
     const QuerySchema = joi.object({
         scheduleName:joi.string().max(18).required()
@@ -227,7 +222,7 @@ app.put('/api/schedules/addCourse', (req, res) => {
     }
   });
 
-  //6
+  //Get the list of subject code, course code pairs for a given schedule
   app.get('/api/schedules/ShowCourses', (req,res) => {
 
     const showschema = joi.object({
@@ -251,24 +246,32 @@ app.put('/api/schedules/addCourse', (req, res) => {
   })
   
 
-//7
+//Delete a schedule with a given name. Return an error if the given schedule doesn’t exist
 app.delete('/api/schedules', (req,res) => {
-    CurrentData = req.query.schedule;
+    
+    const QuerySchema55 = joi.object({
+        name:joi.string().max(18).min(1).required()
+    })
+    const RESULT55 = QuerySchema55.validate(req.query);
+    if (RESULT55.error){
+        res.status(400).send("Bad Query");
+        return; 
+
+    }
+     CurrentData = req.query.name;
     
 
-    db.get('schedules')
-    .remove({scheduleName: CurrentData})
-    .write()
-
-    if (db.has('scheduleName : CurrentData').value()) {
-        return res.status(400).send( "bad request");
-    } else {
-        return res.status(200).send({
-            message: "Schedule is deleted successfully"
-        });
+      if(db.get('schedules').find({scheduleName: CurrentData}).value()) {
+        db.get('schedules').remove({scheduleName: CurrentData}).write()
+        res.status(200).send("The selected schedule has been deleted");
+         
+        }
+    
+    else {
+        return res.status(404).send("The schedule name is not found ");
     }
-})
-//8
+});
+//Get a list of schedule names and the number of courses that are saved in each schedule.
 app.get('/api/schedules/schedulesList', (req,res) => {
            
         let ScheduleArray = [];
@@ -280,7 +283,7 @@ app.get('/api/schedules/schedulesList', (req,res) => {
     
 });
 
-//9
+//Delete all schedules
 app.delete('/api/schedules/all' , (req,res) =>{
 db.unset("schedules").write(); //it delets all schedules
 db.defaults({schedules: []}).write() //restart the system to make sure we can accept new schedule name
