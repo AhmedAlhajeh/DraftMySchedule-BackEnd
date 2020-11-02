@@ -74,7 +74,7 @@ app.get('/api/courses/submit' , (req,res) => {
 function removeDuplicates(Array){
     return Array.filter((a,b) => Array.indexOf(a) === b) //no duplicates for the drop menu in front end
 };
-
+//show all the results of subjects and class names in the following link
 app.get('/api/courses', (req,res) => {
     let SubjectArray = [];
     for(i=0; i< data.length; i++){
@@ -109,7 +109,7 @@ app.get('/api/courses/search/:subjectcode', (req,res) => {
         }
         
     }
-    
+    //no duplicating for the frond end part
     NumberArray = removeDuplicates(NumberArray);
     if(NumberArray.length <= 0){
         res.status(404).send("Subject code does not exist");
@@ -123,7 +123,7 @@ app.get('/api/courses/search/:subjectcode', (req,res) => {
 //Get the Timetable entry for a given subject code and course code and optional component
 app.get('/api/courses/search/:subjectcode/:coursecode', (req,res) => {
 
-   
+   // we are making sure the inputs should be maximum three and minimum three for the component and one query only
     const WithComponent = joi.object({
         component:joi.string().max(3).min(3)
     })
@@ -144,6 +144,7 @@ app.get('/api/courses/search/:subjectcode/:coursecode', (req,res) => {
                 return;
 
             }
+            //if there is a component then show component 
             else if(component == data[o].course_info[0].ssr_component){
                 res.send(data[o]);
                 return;
@@ -162,6 +163,7 @@ app.get('/api/courses/search/:subjectcode/:coursecode', (req,res) => {
 
 //Create a new schedule (to save a list of courses) with a given schedule name. Return an error if name exists
 app.post('/api/schedules/createschedule' ,(req,res) => {
+    //the input should be at least one character for the name of the schedule and one query only
     const schema = joi.object({
         name:joi.string().max(18).min(1).required()
     })
@@ -172,7 +174,7 @@ app.post('/api/schedules/createschedule' ,(req,res) => {
 
     }
     CurrentData =req.query.name;
-
+    //if the schedule name is already exist
     if (db.get('schedules').find({scheduleName: CurrentData}).value()){
     return res.status(400).send( "Something Went Wrong");
     } else {
@@ -199,7 +201,7 @@ app.put('/api/schedules/addCourse', (req, res) => {
         return; 
 
     }
-
+    //if the course list is not entered as an array
     const BodySchema = joi.object({
         CourseList:joi.array().required()
     })
@@ -224,7 +226,7 @@ app.put('/api/schedules/addCourse', (req, res) => {
 
   //Get the list of subject code, course code pairs for a given schedule
   app.get('/api/schedules/ShowCourses', (req,res) => {
-
+    //making sure we entered the name of the schedule (not empty string)
     const showschema = joi.object({
         name:joi.string().max(18).min(1).required()
     })
@@ -236,7 +238,7 @@ app.put('/api/schedules/addCourse', (req, res) => {
     }
 
     const ShowList = req.query.name;
-
+    //find the course list of the specific shcedule
     if (db.get('schedules').find({scheduleName: ShowList}).value()){
         res.send (db.get('schedules').find({scheduleName: ShowList}).value().CourseList); 
     }
@@ -266,7 +268,7 @@ app.delete('/api/schedules', (req,res) => {
         res.status(200).send("The selected schedule has been deleted");
          
         }
-    
+    //if the schedule does not exist
     else {
         return res.status(404).send("The schedule name is not found ");
     }
