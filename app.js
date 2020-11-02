@@ -15,95 +15,6 @@ db.defaults({schedules: []})
 .write()
 
 
-
-/*app.get('/api/schedules/load/:schedule_id', (res,req) => {
-    const data = req.params.schedule_id;
-    const sched_array = db.get('schedules').map('schedule_id').value
-
-    for (i=0; i < sched_array.length; i++) {
-        if (sched_array[i] == data) {
-            var ref_num = i;
-        }
-    }
-
-    const sched_list = db.get('schedules[' + ref_num + '].schedule_information').map().value();
-
-    if (sched_list.length>0){
-        return res.status(200).send(
-            sched_list
-        );
-    }
-
-    else {
-        return res.status(200).send({
-            message: "No course"
-        });
-    }
-
-});
-
-app.get('/api/schedules/check', (req,res) => {
-    const CurrentData = req.query;
-    const sched_name = CurrentData.schedule;
-    const crs_code = CurrentData.course_code;
-    sched_array= db.get('schedules').map('schedule_id').value();
-
-    for (i=0; i<sched_array.length; i++){
-        if (sched_array[i] == sched_name){
-            var ref_num = i;
-        }
-    }
-    
-
-    course_array = db.get('schedules[' + ref_num + '].schedule_information').map().value();
-
-    for (i=0; i < course_array.length; i++){
-        if (course_array[i].course_code == crs_code){
-         return res.status(20).send({
-                message: "Exists"
-        });
-        }
-    }
-
-    return res.status(200).send({
-        message: "Course does not exists"
-    });
-});
-
-app.post('/api/schedules/addcourse', (req,res) => {
-    const CurrentData = req.query;
-    const sched_name = CurrecntData.schedule;
-    const course_name = CurrentData.course_name;
-    const sbj_code = CurrentData.subject_code;
-    const crs_code = CurrentData.course_code;
-
-    sched_array= db.get('schedules').map('schedule_id').value();
-
-    for(i=0; i< sched_array.length; i++){
-        if(sched_array[i] == sched_name){
-            var ref_num = i;
-            db.get('schedules[' + ref_num + ').schedule_information').push({course_name, subject_code: sbj_code, course_code: crs_code})
-            return res.status(200).send({
-                message: "Course Added"
-            });
-        }
-    }
-
-    return res.status(400).send({
-        message: "Error Adding course"
-    });
-
-});
-
-
-
-
-app.get('/api/schedules/dropdown', (req,res) => {
-    let name_array = [];
-    name_array = db.get('schedules').map('schedule_id').value();
-    res.send(name_array);
-});*/
-
 app.get('/api/courses/submit' , (req,res) => {
     FinalQuery = req.query;
     SubjectQuery = FinalQuery.Subject;
@@ -152,11 +63,6 @@ app.get('/api/courses/submit' , (req,res) => {
         }
     }
 });
-
-
-
-
-
 
 
 
@@ -262,7 +168,7 @@ app.get('/api/courses/search/:subjectcode/:coursecode', (req,res) => {
 //4
 app.post('/api/schedules/createschedule' ,(req,res) => {
     const schema = joi.object({
-        name:joi.string().max(18).required()
+        name:joi.string().max(18).min(1).required()
     })
     const RESULT = schema.validate(req.query);
     if (RESULT.error){
@@ -322,8 +228,26 @@ app.put('/api/schedules/addCourse', (req, res) => {
   });
 
   //6
-  app.get('/api/schedules/AddCourses', (req,res) => {
+  app.get('/api/schedules/ShowCourses', (req,res) => {
 
+    const showschema = joi.object({
+        name:joi.string().max(18).min(1).required()
+    })
+    const RESULT69 = showschema.validate(req.query);
+    if (RESULT69.error){
+        res.status(400).send("Bad input");
+        return; 
+
+    }
+
+    const ShowList = req.query.name;
+
+    if (db.get('schedules').find({scheduleName: ShowList}).value()){
+        res.send (db.get('schedules').find({scheduleName: ShowList}).value().CourseList); 
+    }
+    else{
+        res.send("not found")
+    }
   })
   
 
