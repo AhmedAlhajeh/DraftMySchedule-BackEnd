@@ -17,14 +17,22 @@
 
     </head>
     <body>
-      <ul class= "navbar">
-        <li><a href= "index.html">Home</a></li>
-        <li><a href= "schedule.html">Creating schedule</a></li>
-        <li><a href= "manage.html">Managing schedule</a></li>
-      </ul>
-      
+        <ul class= "navbar">
+            <li><a href= "index.html">Home</a></li>
+            <li><a href= "schedule.html">Creating schedule</a></li>
+            <li><a href= "manage.html">Managing schedule</a></li>
+          </ul>
         <div id="subject" class="subject">
-            <form >
+            <form>
+
+                <label for="Schedule">Schedule Name:</label>
+                <input type="text"  name="ScheduleName" id="ScheduleName">
+
+
+
+                <br><br>
+
+
                 <label for="Subject">Subject:</label>
                 <select name="Subject" id="Subject">
                 <option value="Subject">Search by Subject</option>
@@ -53,9 +61,9 @@
                 <label for="Component">Component:</label>
                 <select name="Component" id="Component">
                 <option value = "Component"> Search by Component</option>
-                <option value = "LEC">LEC</option>
-                <option value = "LAB">LAB</option>
-                <option value = "TUT">TUT</option>
+                <option value = "Lecture"> Lecture</option>
+                <option value = "Lab"> Lab</option>
+                <option value = "Tutorial"> Turorial</option>
                 </select>
                 
                 <br><br>
@@ -89,6 +97,3 @@
         
     </body>
 </html>
-
-
-

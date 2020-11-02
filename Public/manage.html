@@ -17,51 +17,25 @@
 
     </head>
     <body>
-      <ul class= "navbar">
-        <li><a href= "index.html">Home</a></li>
-        <li><a href= "schedule.html">Creating schedule</a></li>
-        <li><a href= "manage.html">Managing schedule</a></li>
-      </ul>
-      
+        <ul class= "navbar">
+            <li><a href= "index.html">Home</a></li>
+            <li><a href= "schedule.html">Creating schedule</a></li>
+            <li><a href= "manage.html">Managing schedule</a></li>
+          </ul>
         <div id="subject" class="subject">
             <form >
-                <label for="Subject">Subject:</label>
-                <select name="Subject" id="Subject">
-                <option value="Subject">Search by Subject</option>
+                <label for="ScheduleName">Schedule Name:</label>
+                <select name="ScheduleName" id="ScheduleName">
+                <option value="ScheduleName">Search by Schedule</option>
                 </select>
                 
                 <br><br>
                 
               
-
-              
-                <label for="ClassName">Class Name:</label>
-                <select name="ClassName" id="ClassName">
-                <option value="ClassName">Search by Class Name:</option>
-                </select>
-                <br><br>
-    
-              
-                <label for="CourseNumber">Course Number:</label>
-                <input type="text" maxlength="5" name="CourseNumber" id="CourseNumber">
-                  
-                
-                <br><br>
-              
-    
-              
-                <label for="Component">Component:</label>
-                <select name="Component" id="Component">
-                <option value = "Component"> Search by Component</option>
-                <option value = "LEC">LEC</option>
-                <option value = "LAB">LAB</option>
-                <option value = "TUT">TUT</option>
-                </select>
-                
-                <br><br>
             
 
-                <button id= Submit type= "button"  onClick = "CourseSearch()" >Submit</button>
+                <button id= "Submit" type= "button"  onClick = "CourseSearch()" >Display Schedule</button>
+                <button id= "Delete" type= "button"  onclick="DeleteButton()">Delete Schedule</button>
               </form>
               
               
@@ -89,6 +63,3 @@
         
     </body>
 </html>
-
-
-
